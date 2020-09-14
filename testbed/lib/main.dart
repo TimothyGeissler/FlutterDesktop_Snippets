@@ -24,6 +24,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:window_size/window_size.dart' as window_size;
 
+import 'package:vertical_tabs/vertical_tabs.dart';
+
 import 'keyboard_test_page.dart';
 
 // The shared_preferences key for the testbed's color.
@@ -45,7 +47,7 @@ void main() {
       window_size.setWindowMinSize(Size(0.8 * width, 0.8 * height));
       window_size.setWindowMaxSize(Size(1.5 * width, 1.5 * height));
       window_size
-          .setWindowTitle('Flutter Testbed on ${Platform.operatingSystem}');
+          .setWindowTitle('Code Snippets by T. Geissler');
     }
   });
 
@@ -73,7 +75,6 @@ class _AppState extends State<MyApp> {
   }
 
   Color _primaryColor = Colors.blue;
-  int _counter = 0;
 
   static _AppState of(BuildContext context) =>
       context.findAncestorStateOfType<_AppState>();
@@ -91,20 +92,6 @@ class _AppState extends State<MyApp> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_prefKeyColor, _primaryColor.value);
     }
-  }
-
-  void incrementCounter() {
-    _setCounter(_counter + 1);
-  }
-
-  void _decrementCounter() {
-    _setCounter(_counter - 1);
-  }
-
-  void _setCounter(int value) {
-    setState(() {
-      _counter = value;
-    });
   }
 
   /// Rebuilds the native menu bar based on the current state.
@@ -147,26 +134,6 @@ class _AppState extends State<MyApp> {
               }),
         ])
       ]),
-      Submenu(label: 'Counter', children: [
-        MenuItem(
-            label: 'Reset',
-            enabled: _counter != 0,
-            shortcut: LogicalKeySet(
-                LogicalKeyboardKey.meta, LogicalKeyboardKey.digit0),
-            onClicked: () {
-              _setCounter(0);
-            }),
-        MenuDivider(),
-        MenuItem(
-            label: 'Increment',
-            shortcut: LogicalKeySet(LogicalKeyboardKey.f2),
-            onClicked: incrementCounter),
-        MenuItem(
-            label: 'Decrement',
-            enabled: _counter > 0,
-            shortcut: LogicalKeySet(LogicalKeyboardKey.f1),
-            onClicked: _decrementCounter),
-      ]),
     ]);
   }
 
@@ -183,80 +150,102 @@ class _AppState extends State<MyApp> {
         accentColor: _primaryColor,
       ),
       darkTheme: ThemeData.dark(),
-      home: _MyHomePage(title: 'Flutter Demo Home Page', counter: _counter),
+      home: _MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class _MyHomePage extends StatelessWidget {
-  const _MyHomePage({this.title, this.counter = 0});
+  const _MyHomePage({this.title});
 
   final String title;
-  final int counter;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: LayoutBuilder(
-        builder: (context, viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(minHeight: viewportConstraints.maxHeight),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      'You have pushed the button this many times:',
-                    ),
-                    new Text(
-                      '$counter',
-                      style: Theme.of(context).textTheme.headline4,
-                    ),
-                    TextInputTestWidget(),
-                    FileChooserTestWidget(),
-                    URLLauncherTestWidget(),
-                    new RaisedButton(
-                      child: new Text('Test raw keyboard events'),
-                      onPressed: () {
-                        Navigator.of(context).push(new MaterialPageRoute(
-                            builder: (context) => KeyboardTestPage()));
-                      },
-                    ),
-                    Container(
-                      width: 380.0,
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0)),
-                      child: Scrollbar(
-                        child: ListView.builder(
-                          padding: EdgeInsets.all(8.0),
-                          itemExtent: 20.0,
-                          itemCount: 50,
-                          itemBuilder: (context, index) {
-                            return Text('entry $index');
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _AppState.of(context).incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
-    );
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: Container(
+          child: verticalTabs(context),
+        ));
   }
+}
+//TODO: Dynamic 1st level tabs
+Widget verticalTabs(BuildContext context) {
+  return VerticalTabs(
+    tabsWidth: 150,
+    direction: TextDirection.ltr,
+    contentScrollAxis: Axis.vertical,
+    changePageDuration: Duration(milliseconds: 500),
+    tabs: <Tab>[
+      Tab(child: Text('Flutter'), icon: Icon(Icons.phone)),
+      Tab(child: Text('Dart')),
+      Tab(
+        child: Container(
+          margin: EdgeInsets.only(bottom: 1),
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.favorite),
+              SizedBox(width: 25),
+              Text('Javascript'),
+            ],
+          ),
+        ),
+      ),
+      Tab(child: Text('NodeJS')),
+      Tab(child: Text('PHP')),
+    ],
+    contents: <Widget>[
+      tabsContent(
+          'Flutter', 'You can change page by scrolling content horizontally'),
+      tabsContent('Dart'),
+      tabsContent('Javascript'),
+      tabsContent('NodeJS'),
+      tabsContent('PHP'),
+    ],
+  );
+}
+
+Widget tabsContent(String caption, [String description = '']) {
+  return Container(
+    margin: EdgeInsets.all(10),
+    padding: EdgeInsets.all(20),
+    color: Colors.black12,
+    child: Column(
+      children: <Widget>[
+        Text(
+          caption,
+          style: TextStyle(fontSize: 25),
+        ),
+        Divider(
+          height: 20,
+          color: Colors.black45,
+        ),
+        Text(
+          description,
+          style: TextStyle(fontSize: 15, color: Colors.black87),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget tabs(BuildContext context) {
+  return DefaultTabController(
+    length: 3,
+    child: Scaffold(
+      appBar: AppBar(
+        bottom: TabBar(
+          tabs: [
+            Tab(icon: Icon(Icons.directions_car)),
+            Tab(icon: Icon(Icons.directions_transit)),
+            Tab(icon: Icon(Icons.directions_bike)),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 /// A widget containing controls to test the file chooser plugin.

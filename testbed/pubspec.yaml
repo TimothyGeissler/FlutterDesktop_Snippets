@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  vertical_tabs: ^0.2.0
   cupertino_icons: ^0.1.0
 
   # FDE plugins.
