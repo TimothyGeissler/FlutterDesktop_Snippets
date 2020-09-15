@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:file_chooser/file_chooser.dart';
+import 'package:flutter_highlight/themes/github.dart';
 import 'package:menubar/menubar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +26,7 @@ import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:window_size/window_size.dart' as window_size;
 
 import 'package:vertical_tabs/vertical_tabs.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
 
 import 'keyboard_test_page.dart';
 
@@ -46,8 +48,7 @@ void main() {
       window_size.setWindowFrame(frame);
       window_size.setWindowMinSize(Size(0.8 * width, 0.8 * height));
       window_size.setWindowMaxSize(Size(1.5 * width, 1.5 * height));
-      window_size
-          .setWindowTitle('Code Snippets by T. Geissler');
+      window_size.setWindowTitle('Code Snippets by T. Geissler');
     }
   });
 
@@ -151,7 +152,10 @@ class _AppState extends State<MyApp> {
         accentColor: _primaryColor,
       ),
       darkTheme: ThemeData.dark(),
-      home: _MyHomePage(title: 'My Snippets', primaryColor: _primaryColor,),
+      home: _MyHomePage(
+        title: 'My Snippets',
+        primaryColor: _primaryColor,
+      ),
     );
   }
 }
@@ -194,7 +198,7 @@ class _MyHomePage extends StatelessWidget {
   Widget verticalTabs(BuildContext context, Color primaryColor) {
     return VerticalTabs(
       tabsWidth: 200,
-      tabsElevation: 5,
+      tabsElevation: 10,
       indicatorColor: primaryColor,
       selectedTabBackgroundColor: primaryColor.withAlpha(50),
       direction: TextDirection.ltr,
@@ -202,15 +206,110 @@ class _MyHomePage extends StatelessWidget {
       changePageDuration: Duration(milliseconds: 500),
       tabs: mainTabList,
       contents: <Widget>[
-        tabsContent(
-            'Flutter', 'You can change page by scrolling content horizontally'),
-        tabsContent('Dart'),
-        tabsContent('Javascript'),
-        tabsContent('NodeJS'),
-        tabsContent('PHP'),
+        verticalInnerTabs(context, primaryColor),
+        verticalInnerTabs(context, primaryColor),
+        verticalInnerTabs(context, primaryColor),
+        verticalInnerTabs(context, primaryColor),
+        verticalInnerTabs(context, primaryColor),
       ],
     );
   }
+
+  Widget verticalInnerTabs(BuildContext context, Color primaryColor) {
+    return VerticalTabs(
+      tabsWidth: 200,
+      tabsElevation: 5,
+      indicatorColor: primaryColor,
+      selectedTabBackgroundColor: primaryColor.withAlpha(50),
+      direction: TextDirection.ltr,
+      contentScrollAxis: Axis.vertical,
+      changePageDuration: Duration(milliseconds: 500),
+      tabs: <Tab>[
+        Tab(
+          child: Text("Tab1"),
+        ),
+        Tab(
+          child: Text("Tab2"),
+        ),
+        Tab(
+          child: Text("Tab3"),
+        ),
+      ],
+      contents: <Widget>[
+        tabsContentInfo("yehaw1", "description", '''main() {
+  print("Hello, World!");
+}
+'''),
+        tabsContent("yehaw2"),
+        tabsContent("yehaw3"),
+      ],
+    );
+  }
+}
+
+Widget tabsContentInfo(String header, [String description, String text]) {
+  TextEditingController descController = new TextEditingController();
+  TextEditingController codeController = new TextEditingController();
+  descController.text = description;
+  codeController.text = text;
+  return Container(
+    margin: EdgeInsets.all(10),
+    padding: EdgeInsets.all(20),
+    color: Colors.white,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              header,
+              style: TextStyle(fontSize: 25),
+            ),
+            GestureDetector(
+              onTap: () {
+                print("edit title");
+              },
+              child: Icon(Icons.edit),
+            )
+          ],
+        ),
+        Divider(
+          height: 20,
+          color: Colors.black45,
+        ),
+        TextField(
+          controller: descController,
+          autofocus: false,
+          //maxLines: 8,
+          decoration: InputDecoration(
+            labelText: "Description",
+          ),
+        ),
+        HighlightView(
+          // The original code to be highlighted
+          text,
+
+          // Specify language
+          // It is recommended to give it a value for performance
+          language: 'dart',
+
+          // Specify highlight theme
+          // All available themes are listed in `themes` folder
+          theme: githubTheme,
+
+          // Specify padding
+          padding: EdgeInsets.all(12),
+
+          // Specify text style
+          textStyle: TextStyle(
+            fontFamily: 'My awesome monospace font',
+            fontSize: 16,
+          ),
+        )
+      ],
+    ),
+  );
 }
 
 Widget tabsContent(String caption, [String description = '']) {
