@@ -144,67 +144,73 @@ class _AppState extends State<MyApp> {
 
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         primaryColor: _primaryColor,
         accentColor: _primaryColor,
       ),
       darkTheme: ThemeData.dark(),
-      home: _MyHomePage(title: 'Flutter Demo Home Page'),
+      home: _MyHomePage(title: 'My Snippets', primaryColor: _primaryColor,),
     );
   }
 }
 
 class _MyHomePage extends StatelessWidget {
-  const _MyHomePage({this.title});
+  _MyHomePage({this.title, this.primaryColor});
 
   final String title;
+  final Color primaryColor;
+
+  List<Tab> mainTabList = [];
+
+  void initState() {
+    mainTabList.add(new Tab(child: Text('Flutter'), icon: Icon(Icons.phone)));
+    mainTabList.add(new Tab(child: Text('Dart')));
+    mainTabList.add(new Tab(child: Text('Javascript')));
+    mainTabList.add(new Tab(child: Text('NodeJS')));
+    mainTabList.add(new Tab(child: Text('PHP')));
+  }
 
   @override
   Widget build(BuildContext context) {
+    initState();
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
-        ),
-        body: Container(
-          child: verticalTabs(context),
-        ));
-  }
-}
-//TODO: Dynamic 1st level tabs
-Widget verticalTabs(BuildContext context) {
-  return VerticalTabs(
-    tabsWidth: 150,
-    direction: TextDirection.ltr,
-    contentScrollAxis: Axis.vertical,
-    changePageDuration: Duration(milliseconds: 500),
-    tabs: <Tab>[
-      Tab(child: Text('Flutter'), icon: Icon(Icons.phone)),
-      Tab(child: Text('Dart')),
-      Tab(
-        child: Container(
-          margin: EdgeInsets.only(bottom: 1),
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.favorite),
-              SizedBox(width: 25),
-              Text('Javascript'),
-            ],
+          centerTitle: true,
+          leading: GestureDetector(
+            onTap: () {
+              print("Add lang Tab");
+            },
+            child: Icon(Icons.create_new_folder),
           ),
         ),
-      ),
-      Tab(child: Text('NodeJS')),
-      Tab(child: Text('PHP')),
-    ],
-    contents: <Widget>[
-      tabsContent(
-          'Flutter', 'You can change page by scrolling content horizontally'),
-      tabsContent('Dart'),
-      tabsContent('Javascript'),
-      tabsContent('NodeJS'),
-      tabsContent('PHP'),
-    ],
-  );
+        body: Container(
+          child: verticalTabs(context, primaryColor),
+        ));
+  }
+
+  Widget verticalTabs(BuildContext context, Color primaryColor) {
+    return VerticalTabs(
+      tabsWidth: 200,
+      tabsElevation: 5,
+      indicatorColor: primaryColor,
+      selectedTabBackgroundColor: primaryColor.withAlpha(50),
+      direction: TextDirection.ltr,
+      contentScrollAxis: Axis.vertical,
+      changePageDuration: Duration(milliseconds: 500),
+      tabs: mainTabList,
+      contents: <Widget>[
+        tabsContent(
+            'Flutter', 'You can change page by scrolling content horizontally'),
+        tabsContent('Dart'),
+        tabsContent('Javascript'),
+        tabsContent('NodeJS'),
+        tabsContent('PHP'),
+      ],
+    );
+  }
 }
 
 Widget tabsContent(String caption, [String description = '']) {
