@@ -185,7 +185,7 @@ class _MyHomePage extends StatelessWidget {
           centerTitle: true,
           leading: GestureDetector(
             onTap: () {
-              print("Add lang Tab");
+              addMainTab();
             },
             child: Icon(Icons.create_new_folder),
           ),
@@ -193,6 +193,11 @@ class _MyHomePage extends StatelessWidget {
         body: Container(
           child: verticalTabs(context, primaryColor),
         ));
+  }
+
+  void addMainTab() {
+    print("Add lang Tab");
+    mainTabList.add(new Tab(child: Text('PHP2')));
   }
 
   Widget verticalTabs(BuildContext context, Color primaryColor) {
@@ -236,8 +241,28 @@ class _MyHomePage extends StatelessWidget {
         ),
       ],
       contents: <Widget>[
-        tabsContentInfo("yehaw1", "description", '''main() {
-  print("Hello, World!");
+        tabsContentInfo("yehaw1", "description", '''Widget tabsContent(String caption, [String description = '']) {
+  return Container(
+    margin: EdgeInsets.all(10),
+    padding: EdgeInsets.all(20),
+    color: Colors.black12,
+    child: Column(
+      children: <Widget>[
+        Text(
+          caption,
+          style: TextStyle(fontSize: 25),
+        ),
+        Divider(
+          height: 20,
+          color: Colors.black45,
+        ),
+        Text(
+          description,
+          style: TextStyle(fontSize: 15, color: Colors.black87),
+        ),
+      ],
+    ),
+  );
 }
 '''),
         tabsContent("yehaw2"),
@@ -286,26 +311,36 @@ Widget tabsContentInfo(String header, [String description, String text]) {
             labelText: "Description",
           ),
         ),
-        HighlightView(
-          // The original code to be highlighted
-          text,
-
-          // Specify language
-          // It is recommended to give it a value for performance
-          language: 'dart',
-
-          // Specify highlight theme
-          // All available themes are listed in `themes` folder
-          theme: githubTheme,
-
-          // Specify padding
-          padding: EdgeInsets.all(12),
-
-          // Specify text style
-          textStyle: TextStyle(
-            fontFamily: 'My awesome monospace font',
-            fontSize: 16,
-          ),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Expanded(
+                    child: HighlightView(
+                      // The original code to be highlighted
+                      text,
+                      // Specify language
+                      // It is recommended to give it a value for performance
+                      language: 'dart',
+                      // Specify highlight theme
+                      // All available themes are listed in `themes` folder
+                      theme: githubTheme,
+                      // Specify padding
+                      padding: EdgeInsets.all(12),
+                      // Specify text style
+                      textStyle: TextStyle(
+                        fontFamily: 'My awesome monospace font',
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                ],
+              )
+            )
+          )
         )
       ],
     ),
